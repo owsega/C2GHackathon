@@ -25,7 +25,7 @@
             android:gravity="center"
             android:orientation="vertical">
 
-            <com.pkmmte.view.CircularImageView
+            <ImageView
                 android:id="@+id/profile_pic"
                 android:layout_width="120dp"
                 android:layout_height="120dp"
@@ -33,15 +33,47 @@
                 android:scaleType="centerInside"
                 android:src="@drawable/com_facebook_profile_picture_blank_portrait"/>
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
+                android:orientation="horizontal">
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
+
+                    <android.support.design.widget.TextInputEditText
+                        android:id="@+id/first_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/first_name"/>
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
+
+                    <android.support.design.widget.TextInputEditText
+                        android:id="@+id/last_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/last_name"/>
+                </android.support.design.widget.TextInputLayout>
+            </LinearLayout>
+
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
                 <android.support.design.widget.TextInputEditText
-                    android:id="@+id/first_name"
+                    android:id="@+id/dob"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/first_name"/>
+                    android:hint="Date Of Birth"
+                    android:inputType="date"/>
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
@@ -49,10 +81,21 @@
                 android:layout_height="wrap_content">
 
                 <android.support.design.widget.TextInputEditText
-                    android:id="@+id/last_name"
+                    android:id="@+id/address"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/last_name"/>
+                    android:hint="Residential Address"/>
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/occupation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Occupation"/>
             </android.support.design.widget.TextInputLayout>
 
             <Button

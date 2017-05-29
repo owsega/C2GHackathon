@@ -1,15 +1,17 @@
 package com.owsega.c2ghackathon;
 
+import android.Manifest.permission;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.provider.MediaStore.Images.Media;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
@@ -18,7 +20,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.firebase.ui.auth.IdpResponse;
@@ -29,11 +33,18 @@ import com.flipboard.bottomsheet.commons.ImagePickerSheetView.ImagePickerTile;
 import com.flipboard.bottomsheet.commons.ImagePickerSheetView.ImageProvider;
 import com.flipboard.bottomsheet.commons.ImagePickerSheetView.OnTileSelectedListener;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
-import com.pkmmte.view.CircularImageView;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask.TaskSnapshot;
+import com.owsega.c2ghackathon.User.Status;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,11 +65,12 @@ public class SignedInActivity extends AppCompatActivity {
     private static final int LOAD_IMAGE_RC = 13;
     private static final int IMAGE_CAPTURE_RC = 14;
     private static final String TAG = "SignedInActivity";
+    private static final String USERS = "users";
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
     @BindView(R.id.profile_pic)
-    CircularImageView profilePic;
+    ImageView profilePic;
     @BindView(R.id.first_name)
     TextInputEditText firstName;
     @BindView(R.id.last_name)
@@ -66,6 +78,16 @@ public class SignedInActivity extends AppCompatActivity {
     @BindView(R.id.bottomsheet)
     BottomSheetLayout bottomsheet;
     FirebaseUser user;
+    StorageReference storageReference;
+    DatabaseReference dbReference;
+    @BindView(R.id.dob)
+    TextInputEditText dob;
+    @BindView(R.id.address)
+    TextInputEditText address;
+    @BindView(R.id.occupation)
+    TextInputEditText occupation;
+    @BindView(R.id.save)
+    Button save;
     private Uri cameraImageUri;
     private Uri userImageUri;
 
@@ -85,7 +107,9 @@ public class SignedInActivity extends AppCompatActivity {
 
         user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
-//            sendVerificationEmail(user); todo enable, to get verification emails
+            sendVerificationEmail(user);
+            storageReference = FirebaseStorage.getInstance().getReference(user.getUid());
+            dbReference = FirebaseDatabase.getInstance().getReference().child(USERS);
         } else {
             // todo return user to Registrant Activity
         }
@@ -109,7 +133,7 @@ public class SignedInActivity extends AppCompatActivity {
     @OnClick(R.id.profile_pic)
     public void profilePicClicked() {
         boolean needsPermissions = ActivityCompat.checkSelfPermission(this,
-                android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED;
+                permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED;
         if (needsPermissions) {
             requestStoragePermission();
         } else {
@@ -117,12 +141,12 @@ public class SignedInActivity extends AppCompatActivity {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+    @TargetApi(VERSION_CODES.JELLY_BEAN)
     private void requestStoragePermission() {
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, STORAGE_RC);
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this, permission.WRITE_EXTERNAL_STORAGE)) {
+            ActivityCompat.requestPermissions(this, new String[]{permission.WRITE_EXTERNAL_STORAGE}, STORAGE_RC);
         } else {
-            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, STORAGE_RC);
+            ActivityCompat.requestPermissions(this, new String[]{permission.WRITE_EXTERNAL_STORAGE}, STORAGE_RC);
         }
     }
 
@@ -153,7 +177,7 @@ public class SignedInActivity extends AppCompatActivity {
                         } else if (selectedTile.isPickerTile()) {
                             startActivityForResult(createPickIntent(), LOAD_IMAGE_RC);
                         } else if (selectedTile.isImageTile()) {
-                            showSelectedImage(selectedTile.getImageUri());
+                            uploadSelectedImage(selectedTile.getImageUri());
                         } else {
                             snack(bottomsheet, R.string.general_error);
                         }
@@ -190,7 +214,7 @@ public class SignedInActivity extends AppCompatActivity {
      */
     @Nullable
     private Intent createPickIntent() {
-        Intent picImageIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        Intent picImageIntent = new Intent(Intent.ACTION_PICK, Media.EXTERNAL_CONTENT_URI);
         if (picImageIntent.resolveActivity(getPackageManager()) != null) {
             return picImageIntent;
         } else {
@@ -217,12 +241,28 @@ public class SignedInActivity extends AppCompatActivity {
         }
     }
 
-    private void showSelectedImage(Uri imageUri) {
-        userImageUri = imageUri;
-        Glide.with(this)
-                .load(imageUri)
-                .crossFade()
-                .into(profilePic);
+    private void uploadSelectedImage(Uri uri) {
+        profilePic.setImageURI(uri);
+        // Upload to Cloud Storage
+        storageReference.putFile(uri)
+                .addOnSuccessListener(this, new OnSuccessListener<TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(TaskSnapshot taskSnapshot) {
+                        Toast.makeText(SignedInActivity.this, "Image uploaded",
+                                Toast.LENGTH_SHORT).show();
+                        Uri path = taskSnapshot.getMetadata().getDownloadUrl();
+                        Log.d(TAG, "uploadPhoto:onSuccess:" + path);
+                        showSelectedImage(path);
+                    }
+                })
+                .addOnFailureListener(this, new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "uploadPhoto:onError", e);
+                        Toast.makeText(SignedInActivity.this, "Upload failed",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     /**
@@ -247,6 +287,14 @@ public class SignedInActivity extends AppCompatActivity {
         return imageFile;
     }
 
+    void showSelectedImage(Uri url) {
+        Glide.with(this)
+                .load(userImageUri = url)
+                .centerCrop()
+                .crossFade()
+                .into(profilePic);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -262,7 +310,7 @@ public class SignedInActivity extends AppCompatActivity {
                 selectedImage = cameraImageUri;
             }
 
-            showSelectedImage(selectedImage);
+            uploadSelectedImage(selectedImage);
         }
     }
 
@@ -307,5 +355,21 @@ public class SignedInActivity extends AppCompatActivity {
                         }
                     }
                 });
+
+        User thisUser = new User(user.getUid())
+                .setFirstName(fname)
+                .setLastName(lname)
+                .setProfilePicUrl(userImageUri.toString())
+                .setAddress(address.getText().toString())
+                .setDateOfBirth(dob.getText().toString())
+                .setEmail(user.getEmail())
+                .setOccupation(occupation.getText().toString())
+                .setStatus(Status.REGISTRANT);
+        dbReference.child(user.getUid()).setValue(thisUser);
+    }
+
+    @OnClick(R.id.dob)
+    public void showDatePicker() {
+        new DatePickerHelper().showDatePicker(dob, null, null, System.currentTimeMillis());
     }
 }
