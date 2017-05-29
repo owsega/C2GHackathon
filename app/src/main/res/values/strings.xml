@@ -6,4 +6,11 @@
     <string name="unknown_error">Ooops. An error occurred</string>
     <string name="unknown_sign_in_response">Unknown Sign In Response</string>
     <string name="title_activity_signed_in">SignedInActivity</string>
+    <string name="first_name">First Name</string>
+    <string name="last_name">Last Name</string>
+    <string name="save">Save</string>
+    <string name="select_image">Please select an image...</string>
+    <string name="image_creation_failed">Could not create imageFile for camera</string>
+    <string name="grant_pictures_permissn_in_settings">Please grant permissions for taking pictures</string>
+    <string name="choose_img_eror">Please choose an image</string>
 </resources>

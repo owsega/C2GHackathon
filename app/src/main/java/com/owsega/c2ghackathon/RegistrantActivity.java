@@ -2,9 +2,7 @@ package com.owsega.c2ghackathon;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.StringRes;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -20,6 +18,8 @@ import java.util.Arrays;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+
+import static com.owsega.c2ghackathon.Utils.snack;
 
 public class RegistrantActivity extends AppCompatActivity {
 
@@ -87,26 +87,23 @@ public class RegistrantActivity extends AppCompatActivity {
                 // Sign in failed
                 if (response == null) {
                     // User pressed back button
-                    showSnackbar(R.string.sign_in_cancelled);
+                    snack(root, R.string.sign_in_cancelled);
                     return;
                 }
 
                 if (response.getErrorCode() == ErrorCodes.NO_NETWORK) {
-                    showSnackbar(R.string.no_internet_connection);
+                    snack(root, R.string.no_internet_connection);
                     return;
                 }
 
                 if (response.getErrorCode() == ErrorCodes.UNKNOWN_ERROR) {
-                    showSnackbar(R.string.unknown_error);
+                    snack(root, R.string.unknown_error);
                     return;
                 }
             }
 
-            showSnackbar(R.string.unknown_sign_in_response);
+            snack(root, R.string.unknown_sign_in_response);
         }
     }
 
-    public void showSnackbar(@StringRes int stringId) {
-        Snackbar.make(root, stringId, Snackbar.LENGTH_SHORT).show();
-    }
 }
