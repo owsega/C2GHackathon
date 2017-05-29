@@ -22,6 +22,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -85,7 +86,7 @@ public class UserInfoActivity extends AppCompatActivity {
     StorageReference storageReference;
     DatabaseReference dbReference;
     @BindView(R.id.dob)
-    TextInputEditText dob;
+    TextView dob;
     @BindView(R.id.address)
     TextInputEditText address;
     @BindView(R.id.occupation)
