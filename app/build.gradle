@@ -1,8 +1,20 @@
 apply plugin: 'com.android.application'
 
+ext {
+    compileSdk = 25
+    targetSdk = 25
+    minSdk = 14
+
+    buildTools = '25.0.2'
+
+    firebaseVersion = '10.2.6'
+    firebaseUiVersion = "1.2.0"
+    supportLibraryVersion = '25.3.1'
+}
+
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    compileSdkVersion compileSdk
+    buildToolsVersion buildTools
     defaultConfig {
         applicationId "com.owsega.c2ghackathon"
         minSdkVersion 17
@@ -24,9 +36,16 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:25.1.1'
+    compile "com.android.support:appcompat-v7:$supportLibraryVersion"
+    compile "com.android.support:design:$supportLibraryVersion"
+    compile "com.google.firebase:firebase-auth:$firebaseVersion"
+    compile "com.google.android.gms:play-services-auth:$firebaseVersion"
+    compile "com.firebaseui:firebase-ui-auth:$firebaseUiVersion"
+    compile "com.google.firebase:firebase-database:$firebaseVersion"
+    compile "com.google.firebase:firebase-storage:$firebaseVersion"
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    compile 'com.android.support:design:25.1.1'
+    compile 'com.jakewharton:butterknife:8.6.0'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.6.0'
     testCompile 'junit:junit:4.12'
 }
 
