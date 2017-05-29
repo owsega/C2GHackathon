@@ -25,7 +25,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SignedInActivity"
+            android:name=".UserInfoActivity"
             android:label="@string/title_activity_signed_in"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>

@@ -10,7 +10,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.owsega.c2ghackathon.SignedInActivity"
+    tools:context="com.owsega.c2ghackathon.UserInfoActivity"
     tools:showIn="@layout/activity_signed_in">
 
     <com.flipboard.bottomsheet.BottomSheetLayout
@@ -30,6 +30,7 @@
                 android:layout_width="120dp"
                 android:layout_height="120dp"
                 android:layout_marginBottom="20dp"
+                android:contentDescription="@null"
                 android:scaleType="centerInside"
                 android:src="@drawable/com_facebook_profile_picture_blank_portrait"/>
 
@@ -64,17 +65,14 @@
                 </android.support.design.widget.TextInputLayout>
             </LinearLayout>
 
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
 
-                <android.support.design.widget.TextInputEditText
-                    android:id="@+id/dob"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Date Of Birth"
-                    android:inputType="date"/>
-            </android.support.design.widget.TextInputLayout>
+            <TextView
+                android:id="@+id/dob"
+                style="@style/Widget.AppCompat.EditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/date_of_birth"
+                android:textColor="@color/textColor"/>
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
@@ -84,7 +82,7 @@
                     android:id="@+id/address"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Residential Address"/>
+                    android:hint="@string/residential_address"/>
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
@@ -95,7 +93,7 @@
                     android:id="@+id/occupation"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Occupation"/>
+                    android:hint="@string/occupation"/>
             </android.support.design.widget.TextInputLayout>
 
             <Button

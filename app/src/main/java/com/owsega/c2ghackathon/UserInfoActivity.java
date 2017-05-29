@@ -59,12 +59,16 @@ import butterknife.OnClick;
 import static com.owsega.c2ghackathon.Utils.setError;
 import static com.owsega.c2ghackathon.Utils.snack;
 
-public class SignedInActivity extends AppCompatActivity {
+/**
+ * For getting additional info from the user, after his/her email has
+ * been ascertained and Firebase is logged in.
+ */
+public class UserInfoActivity extends AppCompatActivity {
 
     private static final int STORAGE_RC = 12;
     private static final int LOAD_IMAGE_RC = 13;
     private static final int IMAGE_CAPTURE_RC = 14;
-    private static final String TAG = "SignedInActivity";
+    private static final String TAG = "UserInfoActivity";
     private static final String USERS = "users";
 
     @BindView(R.id.toolbar)
@@ -92,7 +96,7 @@ public class SignedInActivity extends AppCompatActivity {
     private Uri userImageUri;
 
     public static Intent createIntent(Context context, IdpResponse response) {
-        return new Intent(context, SignedInActivity.class);
+        return new Intent(context, UserInfoActivity.class);
     }
 
     @Override
@@ -107,24 +111,12 @@ public class SignedInActivity extends AppCompatActivity {
 
         user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
-            sendVerificationEmail(user);
             storageReference = FirebaseStorage.getInstance().getReference(user.getUid());
             dbReference = FirebaseDatabase.getInstance().getReference().child(USERS);
         } else {
             // todo return user to Registrant Activity
+            finish();
         }
-    }
-
-    private void sendVerificationEmail(FirebaseUser user) {
-        user.sendEmailVerification()
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            Log.d(TAG, "Email sent.");
-                        }
-                    }
-                });
     }
 
     /**
@@ -161,7 +153,7 @@ public class SignedInActivity extends AppCompatActivity {
                 .setImageProvider(new ImageProvider() {
                     @Override
                     public void onProvideImage(ImageView imageView, Uri imageUri, int size) {
-                        Glide.with(SignedInActivity.this)
+                        Glide.with(UserInfoActivity.this)
                                 .load(imageUri)
 //                                .centerCrop()
                                 .crossFade()
@@ -248,7 +240,7 @@ public class SignedInActivity extends AppCompatActivity {
                 .addOnSuccessListener(this, new OnSuccessListener<TaskSnapshot>() {
                     @Override
                     public void onSuccess(TaskSnapshot taskSnapshot) {
-                        Toast.makeText(SignedInActivity.this, "Image uploaded",
+                        Toast.makeText(UserInfoActivity.this, "Image uploaded",
                                 Toast.LENGTH_SHORT).show();
                         Uri path = taskSnapshot.getMetadata().getDownloadUrl();
                         Log.d(TAG, "uploadPhoto:onSuccess:" + path);
@@ -259,7 +251,7 @@ public class SignedInActivity extends AppCompatActivity {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         Log.w(TAG, "uploadPhoto:onError", e);
-                        Toast.makeText(SignedInActivity.this, "Upload failed",
+                        Toast.makeText(UserInfoActivity.this, "Upload failed",
                                 Toast.LENGTH_SHORT).show();
                     }
                 });

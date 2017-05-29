@@ -14,6 +14,8 @@ import java.util.Calendar;
 import java.util.Date;
 
 /**
+ * Helper for picking dates
+ *
  * @author Seyi Owoeye. Created on 2/6/17.
  */
 public class DatePickerHelper implements OnDateSetListener {
@@ -22,6 +24,9 @@ public class DatePickerHelper implements OnDateSetListener {
     private Date dateCallback;
     private DateFormat dateFormat2 = new SimpleDateFormat("dd/mm/yyyy");
 
+    /**
+     * show date dialog
+     */
     void showDatePicker(@NonNull TextView results, Date dateCallback,
                         @Nullable Long minDate, @Nullable Long maxDate) {
         this.tvCallback = results;
@@ -29,6 +34,7 @@ public class DatePickerHelper implements OnDateSetListener {
 
         showDialog(tvCallback.getContext(), this, minDate, maxDate);
     }
+
 
     private void showDialog(Context context, OnDateSetListener listener,
                             @Nullable Long minDate, @Nullable Long maxDate) {
@@ -43,11 +49,6 @@ public class DatePickerHelper implements OnDateSetListener {
         if (minDate != null) dp.setMinDate(minDate);
         if (maxDate != null) dp.setMaxDate(maxDate);
         dpd.show();
-    }
-
-    public void showDatePicker(Context context, OnDateSetListener listener,
-                               @Nullable Long minDate, @Nullable Long maxDate) {
-        showDialog(context, listener, minDate, maxDate);
     }
 
     @Override

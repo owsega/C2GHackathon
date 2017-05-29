@@ -1,20 +1,22 @@
 package com.owsega.c2ghackathon;
 
 /**
+ * A user of the web app.
+ *
  * @author Seyi Owoeye. Created on 5/29/17.
  */
 public class User {
-    String uid;
-    int status;
-    String firstName;
-    String lastName;
-    String address;
-    String dateOfBirth;
-    String email;
-    String profilePicUrl;
-    String occupation;
+    private String uid;
+    private int status;
+    private String firstName;
+    private String lastName;
+    private String address;
+    private String dateOfBirth;
+    private String email;
+    private String profilePicUrl;
+    private String occupation;
 
-    public User(String uid) {
+    User(String uid) {
         this.uid = uid;
     }
 
@@ -26,13 +28,13 @@ public class User {
         return status;
     }
 
-    public User setStatus(Status status) {
-        this.status = status.ordinal();
+    public User setStatus(int status) {
+        this.status = status;
         return this;
     }
 
-    public User setStatus(int status) {
-        this.status = status;
+    public User setStatus(Status status) {
+        this.status = status.ordinal();
         return this;
     }
 

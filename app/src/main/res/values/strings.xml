@@ -13,4 +13,7 @@
     <string name="image_creation_failed">Could not create imageFile for camera</string>
     <string name="grant_pictures_permissn_in_settings">Please grant permissions for taking pictures</string>
     <string name="choose_img_eror">Please choose an image</string>
+    <string name="date_of_birth">Date Of Birth</string>
+    <string name="residential_address">Residential Address</string>
+    <string name="occupation">Occupation</string>
 </resources>

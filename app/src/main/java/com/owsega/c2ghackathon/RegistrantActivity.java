@@ -2,6 +2,7 @@ package com.owsega.c2ghackathon;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -13,6 +14,8 @@ import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.IdpResponse;
 import com.firebase.ui.auth.ResultCodes;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -23,11 +26,14 @@ import butterknife.ButterKnife;
 
 import static com.owsega.c2ghackathon.Utils.snack;
 
+/**
+ * Launcher Activity. Loads firebase ui auth activity for getting user's email
+ */
 public class RegistrantActivity extends AppCompatActivity {
 
-    private static final String TAG = "RegistrantActivity";
-
     private static final int RC_SIGN_IN = 100;
+
+    FirebaseUser user;
 
     @BindView(R.id.coordinator)
     CoordinatorLayout root;
@@ -40,7 +46,7 @@ public class RegistrantActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
             proceed(null);
         } else {
@@ -56,8 +62,24 @@ public class RegistrantActivity extends AppCompatActivity {
     }
 
     private void proceed(@Nullable IdpResponse response) {
-        startActivity(SignedInActivity.createIntent(this, response));
-        finish();
+        if (response != null) sendVerificationEmail(user);
+        startActivity(UserInfoActivity.createIntent(this, response));
+        if (response == null) finish();
+    }
+
+    /**
+     * sends verification email to the user after successful registration
+     */
+    private void sendVerificationEmail(FirebaseUser user) {
+        user.sendEmailVerification()
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            finish();
+                        }
+                    }
+                });
     }
 
     @Override
